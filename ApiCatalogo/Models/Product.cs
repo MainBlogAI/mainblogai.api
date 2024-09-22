@@ -1,9 +1,9 @@
-﻿using ApiCatalogo.Validation;
+﻿using MainBlog.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace ApiCatalogo.Models;
+namespace MainBlog.Models;
 
 [Table("Product")]
 public class Product : IValidatableObject
@@ -31,12 +31,6 @@ public class Product : IValidatableObject
     public float Inventory { get; set; }
 
     public DateTime CreateDate { get; set; }
-
-    [ForeignKey("CategoriaId")]
-    public int CategoryId { get; set; }
-
-    [JsonIgnore]
-    public Category? Category { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

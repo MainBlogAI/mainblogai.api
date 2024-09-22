@@ -1,17 +1,17 @@
-﻿using ApiCatalogo.Models;
+﻿
+using MainBlog.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiCatalogo.Context
+namespace MainBlog.Context
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-
-        // DbSet is a collection of entities that can be queried, such as tables in a database.
-        public DbSet<Category>? Category { get; set; }
         public DbSet<Product>? Product { get; set; }
 
-        // The DbContextOptions parameter is used to configure the context.
+        public DbSet<Blog>? Blog { get; set; }
+
+        public DbSet<Posts>? Posts { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -20,6 +20,5 @@ namespace ApiCatalogo.Context
         {
             base.OnModelCreating(builder);
         }
-
     }
 }

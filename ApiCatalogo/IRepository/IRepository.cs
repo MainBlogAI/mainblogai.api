@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace ApiCatalogo.Repository.IRepository
+namespace MainBlog.IRepository
 {
     // Definição de uma interface genérica chamada IRepository com um parâmetro de tipo T
     public interface IRepository<T>

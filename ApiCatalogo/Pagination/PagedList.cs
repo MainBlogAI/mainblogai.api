@@ -1,4 +1,4 @@
-﻿namespace ApiCatalogo.Pagination;
+﻿namespace MainBlog.Pagination;
 
 // Define uma classe PagedList genérica que herda de List<T>, onde T é um tipo de classe.
 public class PagedList<T> : List<T> where T : class

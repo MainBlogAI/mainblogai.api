@@ -1,17 +1,20 @@
-using ApiCatalogo.Context;
-using ApiCatalogo.DTOs.Mappins;
-using ApiCatalogo.Exceptions;
-using ApiCatalogo.Logging;
-using ApiCatalogo.Models;
-using ApiCatalogo.Repository;
-using ApiCatalogo.Repository.IRepository;
-using ApiCatalogo.Services.AuthenticationsServices;
+using MainBlog.Context;
+using MainBlog.DTOs.Mappins;
+using MainBlog.Exceptions;
+using MainBlog.Logging;
+using MainBlog.Models;
+using MainBlog.Repository;
+using MainBlog.Services.AuthenticationsServices;
+using MainBlog.IRepository;
+using MainBlog.IService;
+using MainBlog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,11 +35,17 @@ string? mysqlConnection = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL(mysqlConnection).LogTo(Console.WriteLine, LogLevel.Information));
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPostService, PostService>();
+
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
+builder.Services.AddAutoMapper(typeof(DTOMappingProfile));
 
 // --- Configurações de Segurança
 
@@ -50,6 +59,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     // Define o esquema de desafio padrão para JWT Bearer
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
 }).AddJwtBearer(options =>
 {
     // Habilita a persistência do token depois da autenticação
@@ -86,6 +96,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddAuthorization(options =>
 {
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        .Build();
+
     options.AddPolicy("RequireSuperAdministratorRole",
                       policy => policy.RequireRole("SUPERADMIN"));
     options.AddPolicy("RequireAdministratorRole",
@@ -101,6 +116,17 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
     LogLevel = LogLevel.Information
 }));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200") 
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -110,8 +136,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.ConfigureExceptionHandler();
 }
-
+app.UseCors("AllowAngularApp");
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

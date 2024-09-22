@@ -1,5 +1,5 @@
 ﻿
-namespace ApiCatalogo.Logging
+namespace MainBlog.Logging
 {
     public class CustomLogger : ILogger
     {

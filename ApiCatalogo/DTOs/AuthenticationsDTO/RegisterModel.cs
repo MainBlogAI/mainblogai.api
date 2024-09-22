@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ApiCatalogo.DTOs.AuthenticationsDTO
+namespace MainBlog.DTOs.AuthenticationsDTO
 {
     public class RegisterModel
     {

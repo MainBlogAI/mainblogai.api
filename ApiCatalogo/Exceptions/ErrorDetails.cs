@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ApiCatalogo.Exceptions
+namespace MainBlog.Exceptions
 {
     public class ErrorDetails
     {

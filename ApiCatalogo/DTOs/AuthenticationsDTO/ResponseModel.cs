@@ -1,4 +1,4 @@
-﻿namespace ApiCatalogo.DTOs.AuthenticationsDTO
+﻿namespace MainBlog.DTOs.AuthenticationsDTO
 {
     public class ResponseModel
     {

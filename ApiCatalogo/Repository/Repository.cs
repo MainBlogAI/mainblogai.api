@@ -1,9 +1,9 @@
-﻿using ApiCatalogo.Context;
-using ApiCatalogo.Repository.IRepository;
+﻿using MainBlog.Context;
+using MainBlog.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace ApiCatalogo.Repository
+namespace MainBlog.Repository
 {
     public class Repository<T>: IRepository<T> where T : class
     {

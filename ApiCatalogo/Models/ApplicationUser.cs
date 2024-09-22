@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace ApiCatalogo.Models;
+namespace MainBlog.Models;
 
 public class ApplicationUser : IdentityUser
 {

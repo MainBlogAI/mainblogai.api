@@ -1,8 +1,8 @@
-﻿using ApiCatalogo.Validation;
+﻿using MainBlog.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace ApiCatalogo.DTOs
+namespace MainBlog.DTOs
 {
     public class ProdutoDTOUpdateResponse
     {

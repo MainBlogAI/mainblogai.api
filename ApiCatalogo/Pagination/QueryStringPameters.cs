@@ -1,4 +1,4 @@
-﻿namespace ApiCatalogo.Pagination
+﻿namespace MainBlog.Pagination
 {
     public abstract class QueryStringPameters
     {

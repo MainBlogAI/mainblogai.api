@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
 
-namespace ApiCatalogo.Exceptions;
+namespace MainBlog.Exceptions;
 
 public static class ApiExceptionMiddlewareExtensions
 {

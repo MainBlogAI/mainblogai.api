@@ -1,17 +1,17 @@
-﻿using ApiCatalogo.Context;
-using ApiCatalogo.DTOs;
-using ApiCatalogo.Models;
-using ApiCatalogo.Pagination;
-using ApiCatalogo.Repository.IRepository;
+﻿using MainBlog.Context;
+using MainBlog.DTOs;
+using MainBlog.Models;
+using MainBlog.Pagination;
 using AutoMapper;
 using Azure;
+using MainBlog.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 
-namespace ApiCatalogo.Controller
+namespace MainBlog.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,11 +26,6 @@ namespace ApiCatalogo.Controller
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-        }
-
-        public ProductController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("GetAll")]
@@ -59,7 +54,7 @@ namespace ApiCatalogo.Controller
         [HttpGet("Pagination")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts ([FromQuery] ProdutosParrameters produtosParameters)
         {
-            var produtos = await _unitOfWork.ProductRepository.GetPaginatedProductListAsync(produtosParameters);
+            var produtos = await _unitOfWork.ProductService.GetPaginatedProductListAsync(produtosParameters);
             var produtosDTO = _mapper.Map<List<ProductDTO>>(produtos);
             return Ok(produtosDTO);
         }

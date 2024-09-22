@@ -6,7 +6,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: S3cure!P4ssw0rd#2024
-      MYSQL_DATABASE: CatalogoDB
+      MYSQL_DATABASE: MainBlogDb
     ports:
       - "3307:3306"
     volumes:

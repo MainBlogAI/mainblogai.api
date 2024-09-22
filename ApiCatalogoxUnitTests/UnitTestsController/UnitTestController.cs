@@ -1,8 +1,8 @@
-﻿using ApiCatalogo.Context;
-using ApiCatalogo.DTOs.Mappins;
-using ApiCatalogo.Repository;
-using ApiCatalogo.Repository.IRepository;
+﻿using MainBlog.Context;
+using MainBlog.DTOs.Mappins;
+using MainBlog.Repository;
 using AutoMapper;
+using MainBlog.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalogoxUnitTests.UnitTests
@@ -24,7 +24,7 @@ namespace ApiCatalogoxUnitTests.UnitTests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new ProdutoDTOMappingProfile());
+                cfg.AddProfile(new DTOMappingProfile());
             });
             mapper = config.CreateMapper();
             var context = new AppDbContext(dbContextOptions);

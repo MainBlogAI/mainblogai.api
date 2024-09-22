@@ -1,9 +1,9 @@
-﻿using ApiCatalogo.Validation;
+﻿using MainBlog.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using ApiCatalogo.Models;
+using MainBlog.Models;
 
-namespace ApiCatalogo.DTOs
+namespace MainBlog.DTOs
 {
     public class ProductDTO
     {
@@ -29,7 +29,5 @@ namespace ApiCatalogo.DTOs
         public float Inventory { get; set; }
 
         public DateTime CreateDate { get; set; } = DateTime.Now;
-
-        public int CategoryId { get; set; }
     }
 }

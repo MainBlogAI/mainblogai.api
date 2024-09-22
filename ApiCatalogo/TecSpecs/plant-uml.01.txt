@@ -1,0 +1,72 @@
+@startuml
+entity AspNetRoles {
+  + Id : string
+  --
+  Name : string
+  NormalizedName : string
+  ConcurrencyStamp : string
+}
+
+entity AspNetUserRoles {
+  + UserId : string
+  + RoleId : string
+}
+
+entity AspNetUsers {
+  + Id : string
+  --
+  UserName : string
+  NormalizedUserName : string
+  Email : string
+  NormalizedEmail : string
+  EmailConfirmed : bool
+  PasswordHash : string
+  RefreshToken : string
+  RefreshTokenExpiryTime : DateTime
+}
+
+entity AspNetRoleClaims {
+  + RoleId : string
+  --
+  ClaimType : string
+  ClaimValue : string
+}
+
+entity AspNetUserLogins {
+  + LoginProvider : string
+  + ProviderKey : string
+  --
+  ProviderDisplayName : string
+  UserId : string
+}
+
+entity MainBlog {
+  + Id : string
+  --
+  Name : string
+  ProfileImage : string
+  FK_User : string <<FK>>
+}
+
+entity Post {
+  + Id : string
+  --
+  Title : string
+  Description : string
+  Image : string
+  Content : text
+  CreatedAt : DateTime
+  UpdatedAt : DateTime
+  IsPublished : bool
+  FK_Mainblog : string <<FK>>
+}
+
+'AspNetUsers' é equivalente ao 'ApplicationUser'
+AspNetUsers ||--|| MainBlog : "FK: UserId"
+MainBlog ||--o{ Post : "FK: MainBlogId"
+
+AspNetRoles ||--o{ AspNetUserRoles : "FK_Roles"
+AspNetUsers ||--o{ AspNetUserRoles : "FK_Users"
+AspNetRoles ||--o{ AspNetRoleClaims : "FK_RoleClaims"
+AspNetUsers ||--o{ AspNetUserLogins : "FK_UserLogins"
+@enduml

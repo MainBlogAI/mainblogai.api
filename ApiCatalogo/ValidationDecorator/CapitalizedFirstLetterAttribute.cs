@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ApiCatalogo.Validation
+namespace MainBlog.Validation
 {
     public class CapitalizedFirstLetterAttribute : ValidationAttribute
     {

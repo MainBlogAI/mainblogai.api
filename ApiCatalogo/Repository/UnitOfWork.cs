@@ -33,7 +33,7 @@ namespace MainBlog.Repository
              _context.SaveChanges();
         }
 
-        public void Dispose()
+        public void RollBack()
         {
             _context.Dispose();
         }

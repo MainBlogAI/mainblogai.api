@@ -135,8 +135,8 @@ public class AuthController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError,
                                new ResponseModel { Status = "Error", Message = $"User creation failed! Errors: {string.Join(", ", errors)}" });
         }
-
-        return Ok(new ResponseModel { Status = "Success", Message = "User created successfully!" });
+        
+        return await this.Login(new LoginModel(model.Username, model.Password));
     }
 
     [HttpPost]

@@ -2,7 +2,10 @@
 using MainBlog.IRepository;
 using MainBlog.IService;
 using MainBlog.Services;
+using MainBlog.Services.AuthenticationsServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace MainBlog.Repository
 {

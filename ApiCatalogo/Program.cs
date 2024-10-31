@@ -35,11 +35,10 @@ string? mysqlConnection = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL(mysqlConnection).LogTo(Console.WriteLine, LogLevel.Information));
 
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPostService, PostService>();
-
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

@@ -1,4 +1,5 @@
 ﻿using MainBlog.IService;
+using MainBlog.Services.AuthenticationsServices;
 
 namespace MainBlog.IRepository;
 
@@ -11,5 +12,6 @@ public interface IUnitOfWork
     IBlogService BlogService { get; }
 
     IPostService PostService { get; }
+
     void Commit();
 }

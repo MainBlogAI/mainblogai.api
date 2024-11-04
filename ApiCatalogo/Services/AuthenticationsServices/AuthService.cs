@@ -1,30 +1,42 @@
-﻿using MainBlog.Controller;
+﻿using Humanizer;
+using MainBlog.Controller;
 using MainBlog.DTOs.AuthenticationsDTO;
 using MainBlog.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mysqlx.Session;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Policy;
 
 namespace MainBlog.Services.AuthenticationsServices
 {
     public class AuthService : IAuthService
     {
         private ITokenService _tokenService;
+        private IEmailSenderService _emailSenderService;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
         private readonly ILogger<AuthController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public AuthService(){}
 
-        public AuthService(ITokenService tokenService,
-                              RoleManager<IdentityRole> roleManager,
-                              UserManager<ApplicationUser> userManager,
-                              IConfiguration config,
-                              ILogger<AuthController> logger)
+        public AuthService(
+            IHttpContextAccessor httpContextAccessor, 
+            ITokenService tokenService,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            IConfiguration config,
+            ILogger<AuthController> logger)
         {
+            _httpContextAccessor = httpContextAccessor;
             _tokenService = tokenService;
             _roleManager = roleManager;
             _userManager = userManager;
@@ -206,6 +218,36 @@ namespace MainBlog.Services.AuthenticationsServices
             user.RefreshToken = null;
             await _userManager.UpdateAsync(user);
             return true;
+        }
+
+        public async Task<ResponseModel> ForgotPassword(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return new ResponseModel { Status = "Error", Message = "Email not found" };
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var request = _httpContextAccessor?.HttpContext?.Request;
+            var resetLink = $"{request?.Scheme}://{request?.Host}/Account/ResetPassword?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+
+            await _emailSenderService.SendEmailAsync(user.Email, "Password Reset Request",
+                $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
+
+            return new ResponseModel { Status = "Success", Message = "Password reset link has been sent to your email." };
+        }
+
+        public async Task<ResponseModel> ResetPassword(string token, string email, string newPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                new ResponseModel { Status = "Error", Message = $"Email not found" };
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!resetPassResult.Succeeded)
+                new ResponseModel { Status = "Error", Message = $"Error while resetting the password" };
+
+            return new ResponseModel { Status = "Sucesso", Message = $" Password has been reset successfully."};
         }
     }
 }

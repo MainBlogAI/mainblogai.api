@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,8 @@ string? mysqlConnection = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL(mysqlConnection).LogTo(Console.WriteLine, LogLevel.Information));
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBlogService, BlogService>();

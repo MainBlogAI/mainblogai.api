@@ -1,16 +1,12 @@
 ﻿using MainBlog.DTOs.AuthenticationsDTO;
 using MainBlog.Models;
 using MainBlog.Services.AuthenticationsServices;
-using Azure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AutoMapper;
 using MainBlog.IRepository;
+using Microsoft.AspNetCore.Identity.Data;
+using MainBlog.DTOs.Request;
 
 namespace MainBlog.Controller;
 
@@ -18,34 +14,11 @@ namespace MainBlog.Controller;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    // token service é para gerar tokens
-    private ITokenService _tokenService;
-    // role manager é para criar e gerenciar roles
-    private readonly RoleManager<IdentityRole> _roleManager;
-    // user manager é para criar e gerenciar usuários
-    private readonly UserManager<ApplicationUser> _userManager;
-    // IConfiguration é para acessar o appsettings.json
-    private readonly IConfiguration _config;
-
-    private readonly ILogger<AuthController> _logger;
-
     private readonly IAuthService _authService;
 
-    public AuthController(ITokenService tokenService,
-                          RoleManager<IdentityRole> roleManager,
-                          UserManager<ApplicationUser> userManager,
-                          IConfiguration config,
-                          ILogger<AuthController> logger,
-                          IAuthService authService,
-                          IUnitOfWork unitOfWork)
+    public AuthController(IAuthService authService)
     {
-        _tokenService = tokenService;
-        _roleManager = roleManager;
-        _userManager = userManager;
-        _config = config;
-        _logger = logger;
         _authService = authService;
-
     }
 
     [HttpGet]
@@ -118,5 +91,29 @@ public class AuthController : ControllerBase
            return StatusCode(StatusCodes.Status400BadRequest, response);
 
         return StatusCode(StatusCodes.Status200OK, response);
+    }
+
+    [HttpPost("ForgotPassword")]
+    public async Task<IActionResult> ForgotPassword([FromBody] string email)
+    {
+        var response = await _authService.ForgotPassword(email);
+        if (response.Status == "Error")
+        {
+            return BadRequest(response); 
+        }
+
+        return Ok(response); 
+    }
+
+    [HttpPost("ResetPassword")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO request)
+    {
+        var response = await _authService.ResetPassword(request.Token, request.Email, request.NewPassword);
+        if (response.Status == "Error")
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
     }
 }

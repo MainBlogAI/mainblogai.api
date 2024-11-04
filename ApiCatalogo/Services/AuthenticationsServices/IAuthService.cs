@@ -13,5 +13,7 @@ namespace MainBlog.Services.AuthenticationsServices
         Task<bool> RevokeToken(string username);
         Task<ResponseModel> CreateRole(string roleName);
         Task<ResponseModel> AddUserToRole(string email, string roleName);
+        Task<ResponseModel> ForgotPassword(string email);
+        Task<ResponseModel> ResetPassword(string token, string email, string newPassword);
     }
 }

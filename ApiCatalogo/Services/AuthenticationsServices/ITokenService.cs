@@ -8,5 +8,7 @@ namespace MainBlog.Services.AuthenticationsServices
         JwtSecurityToken GenerateAccessToken(IEnumerable<Claim> claims, IConfiguration _config);
         string GenerateRefreshToken();
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token, IConfiguration _config);
+        string GeneratePasswordResetToken(string userId, IConfiguration _config);
+        bool ValidatePasswordResetToken(string token, IConfiguration _config);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MainBlog.DTOs.AuthenticationsDTO;
+using MainBlog.Models.ResultModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace MainBlog.Services.AuthenticationsServices
@@ -11,9 +12,9 @@ namespace MainBlog.Services.AuthenticationsServices
         Task<object> Register(RegisterModel model);
         Task<object> RefreshToken(TokenModel tokenModel);
         Task<bool> RevokeToken(string username);
-        Task<ResponseModel> CreateRole(string roleName);
-        Task<ResponseModel> AddUserToRole(string email, string roleName);
-        Task<ResponseModel> ForgotPassword(string email);
-        Task<ResponseModel> ResetPassword(string token, string email, string newPassword);
+        Task<Result> CreateRole(string roleName);
+        Task<Result> AddUserToRole(string email, string roleName);
+        Task<Result> ForgotPassword(string email);
+        Task<Result> ResetPassword(string token, string newPassword);
     }
 }

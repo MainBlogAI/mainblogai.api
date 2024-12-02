@@ -75,45 +75,50 @@ public class AuthController : ControllerBase
     [Route("CreateRole")]
     public async Task<IActionResult> CreateRole(string roleName)
     {
-        var response = await _authService.CreateRole(roleName);
-        if(response.Status == "Error")
-           return StatusCode(StatusCodes.Status400BadRequest, response);
-        
-        return StatusCode(StatusCodes.Status200OK, response);
+        var result = await _authService.CreateRole(roleName);
+        if(!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return StatusCode(StatusCodes.Status200OK, result);
     }
 
     [HttpPost]
     [Route("AddUserToRole")]
     public async Task<IActionResult> AddUserToRole(string email, string roleName)
     {
-        var response = await _authService.AddUserToRole(email, roleName);
-        if(response.Status == "Error")
-           return StatusCode(StatusCodes.Status400BadRequest, response);
+        var result = await _authService.AddUserToRole(email, roleName);
 
-        return StatusCode(StatusCodes.Status200OK, response);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(new { Message = $"User {email} added to role {roleName}" });
     }
 
     [HttpPost("ForgotPassword")]
-    public async Task<IActionResult> ForgotPassword([FromBody] string email)
+    public async Task<IActionResult> ForgotPassword([FromBody] RequestEmailDTO email)
     {
-        var response = await _authService.ForgotPassword(email);
-        if (response.Status == "Error")
+        var result = await _authService.ForgotPassword(email.Email);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest(response); 
+            return BadRequest(result.Error);
         }
 
-        return Ok(response); 
+        return Ok(new { Message = "Password reset link has been sent to your email." });
     }
 
     [HttpPost("ResetPassword")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO request)
     {
-        var response = await _authService.ResetPassword(request.Token, request.Email, request.NewPassword);
-        if (response.Status == "Error")
+        var result = await _authService.ResetPassword(request.Token, request.NewPassword);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest(response);
+            return BadRequest(result.Error);
         }
 
-        return Ok(response);
+        return Ok(new { Message = "Password has been reset successfully" });
     }
 }

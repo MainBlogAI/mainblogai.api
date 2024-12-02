@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MainBlog.Exceptions
+namespace MainBlog.Models.ResultModels
 {
     public class ErrorDetails
     {

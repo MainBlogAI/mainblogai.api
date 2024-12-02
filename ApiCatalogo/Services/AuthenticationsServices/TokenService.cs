@@ -69,5 +69,60 @@ namespace MainBlog.Services.AuthenticationsServices
 
             return principal;
         }
+
+        public string GeneratePasswordResetToken(string userId, IConfiguration _config)
+        {
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim("purpose", "password_reset")
+        };
+
+            var key = _config.GetSection("JWT").GetValue<string>("SecretKey") ??
+                      throw new InvalidOperationException("Invalid secret key");
+            var privateKey = Encoding.UTF8.GetBytes(key);
+            var signingCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(privateKey),
+                SecurityAlgorithms.HmacSha256Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                SigningCredentials = signingCredentials
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public bool ValidatePasswordResetToken(string token, IConfiguration _config)
+        {
+            try
+            {
+                var secretKey = _config["JWT:SecretKey"] ??
+                                throw new InvalidOperationException("Invalid key");
+
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    ValidateLifetime = true
+                };
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+
+                var purposeClaim = principal.Claims.FirstOrDefault(c => c.Type == "purpose");
+                return purposeClaim?.Value == "password_reset";
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

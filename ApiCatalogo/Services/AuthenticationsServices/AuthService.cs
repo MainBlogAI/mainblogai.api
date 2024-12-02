@@ -2,6 +2,7 @@
 using MainBlog.Controller;
 using MainBlog.DTOs.AuthenticationsDTO;
 using MainBlog.Models;
+using MainBlog.Models.ResultModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -25,16 +26,14 @@ namespace MainBlog.Services.AuthenticationsServices
         private readonly ILogger<AuthController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public AuthService(){}
-
         public AuthService(
             IHttpContextAccessor httpContextAccessor, 
             ITokenService tokenService,
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
             IConfiguration config,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger,
+            IEmailSenderService emailSenderService)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenService = tokenService;
@@ -42,48 +41,7 @@ namespace MainBlog.Services.AuthenticationsServices
             _userManager = userManager;
             _config = config;
             _logger = logger;
-        }
-        public async Task<ResponseModel> AddUserToRole(string email, string roleName)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            roleName = roleName.ToUpper();
-            if (user != null)
-            {
-                var result = await _userManager.AddToRoleAsync(user, roleName);
-
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation(1, $"User {user.Email} added to the {roleName} role");
-                    return new ResponseModel { Status = "Success", Message = $"User {user.Email} added to the {roleName} role" };
-                }
-                else
-                {
-                    return new ResponseModel { Status = "Error", Message = $"Error: Unable to add user {user.Email} to the {roleName} role" };
-                }
-            }
-            return new ResponseModel { Status = "Error", Message = $"Unable to find user" };
-        }
-
-        public async Task<ResponseModel> CreateRole(string roleName)
-        {
-            roleName = roleName.ToUpper();
-            var roleExist = await _roleManager.RoleExistsAsync(roleName);
-            if (!roleExist)
-            {
-                var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-
-                if (roleResult.Succeeded)
-                {
-                    _logger.LogInformation(1, "Roles Added");
-                    return new ResponseModel { Status = "Success", Message = $"Role {roleName} added successfully" };
-                }
-                else
-                {
-                    _logger.LogInformation(2, "Error");
-                    return new ResponseModel { Status = "Error", Message = $"Issue adding the new {roleName} role" };
-                }
-            }
-            return new ResponseModel { Status = "Error", Message = "Role already exist." };
+            _emailSenderService = emailSenderService;
         }
 
         public async Task<List<UserWithRolesDto>> FindAllUsersWithRoles()
@@ -220,34 +178,89 @@ namespace MainBlog.Services.AuthenticationsServices
             return true;
         }
 
-        public async Task<ResponseModel> ForgotPassword(string email)
+        public async Task<Result> CreateRole(string roleName)
+        {
+            roleName = roleName.ToUpper();
+            var roleExist = await _roleManager.RoleExistsAsync(roleName);
+            if (!roleExist)
+            {
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+                if (roleResult.Succeeded)
+                {
+                    _logger.LogInformation(1, "Roles Added");
+                    return Result.Success();
+                }
+                else
+                {
+                    _logger.LogInformation(2, "Error");
+                    return Result.Failure(Error.Failure("RoleCreationError", $"Issue adding the new {roleName} role"));
+                }
+            }
+            return Result.Failure(Error.Conflict("RoleExists", $"Role {roleName} already exists."));
+        }
+
+
+        public async Task<Result> ForgotPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return new ResponseModel { Status = "Error", Message = "Email not found" };
+                return Result.Failure(Error.NotFound("UserNotFound", "Email not found"));
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var token = _tokenService.GeneratePasswordResetToken(user.Id, _config);
 
             var request = _httpContextAccessor?.HttpContext?.Request;
-            var resetLink = $"{request?.Scheme}://{request?.Host}/Account/ResetPassword?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+            var resetLink = $"http://localhost:4200/resetPassword?token={Uri.EscapeDataString(token)}";
 
             await _emailSenderService.SendEmailAsync(user.Email, "Password Reset Request",
                 $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
 
-            return new ResponseModel { Status = "Success", Message = "Password reset link has been sent to your email." };
+            return Result.Success();
         }
 
-        public async Task<ResponseModel> ResetPassword(string token, string email, string newPassword)
+        public async Task<Result> ResetPassword(string token, string newPassword)
+        {
+            if (!_tokenService.ValidatePasswordResetToken(token, _config))
+                return Result.Failure(Error.Validation("InvalidToken", "Invalid or expired token"));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var userId = jwtToken.Claims.First(claim => claim.Type == "sub").Value;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Result.Failure(Error.NotFound("UserNotFound", "User not found"));
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(
+                user,
+                await _userManager.GeneratePasswordResetTokenAsync(user),
+                newPassword
+            );
+
+            return resetPassResult.Succeeded
+                ? Result.Success()
+                : Result.Failure(Error.Validation("PasswordResetError", string.Join("; ", resetPassResult.Errors.Select(e => e.Description))));
+        }
+
+        public async Task<Result> AddUserToRole(string email, string roleName)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                new ResponseModel { Status = "Error", Message = $"Email not found" };
+            roleName = roleName.ToUpper();
 
-            var resetPassResult = await _userManager.ResetPasswordAsync(user, token, newPassword);
-            if (!resetPassResult.Succeeded)
-                new ResponseModel { Status = "Error", Message = $"Error while resetting the password" };
+            if (user != null)
+            {
+                var result = await _userManager.AddToRoleAsync(user, roleName);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation(1, $"User {user.Email} added to the {roleName} role");
+                    return Result.Success();
+                }
+                else
+                {
+                    return Result.Failure(Error.Failure("RoleAssignmentError", $"Unable to add user {user.Email} to the {roleName} role"));
+                }
+            }
 
-            return new ResponseModel { Status = "Sucesso", Message = $" Password has been reset successfully."};
+            return Result.Failure(Error.NotFound("UserNotFound", "Unable to find user"));
         }
     }
 }

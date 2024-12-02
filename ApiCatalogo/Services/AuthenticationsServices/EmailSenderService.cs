@@ -16,9 +16,15 @@ namespace MainBlog.Services.AuthenticationsServices
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
             var smtpSettings = _configuration.GetSection("SMTP");
+
+            if (!int.TryParse(smtpSettings["Port"], out var port))
+            {
+                throw new ArgumentException("O valor da chave 'Port' no SMTP está inválido ou ausente.");
+            }
+
             using var client = new SmtpClient(smtpSettings["Host"])
             {
-                Port = int.Parse(smtpSettings["Port"]),
+                Port = 587,
                 Credentials = new NetworkCredential(smtpSettings["Username"], smtpSettings["Password"]),
                 EnableSsl = true,
             };

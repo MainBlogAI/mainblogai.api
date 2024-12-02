@@ -34,20 +34,6 @@ namespace MainBlog.Logging
 
         private void EscreverTextoNoArquivo(string message)
         {
-            string caminhoArquivoLog = @"C:\Log\log.txt";
-
-            using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true))
-                try
-                {
-                    {
-                        streamWriter.WriteLine(message);
-                        streamWriter.Close();
-                    }
-                } catch (Exception)
-                {
-                    throw;
-                }
-            
 
         }
     }

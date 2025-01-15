@@ -28,7 +28,6 @@ namespace ApiCatalogoxUnitTests.UnitTests
             });
             mapper = config.CreateMapper();
             var context = new AppDbContext(dbContextOptions);
-            unitOfWork = new UnitOfWork(context);
         }
     }
 }

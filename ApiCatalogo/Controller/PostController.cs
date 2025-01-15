@@ -40,7 +40,7 @@ namespace MainBlog.Controller
             var post = _mapper.Map<Posts>(postRequest);
             var newPost = await _unitOfWork.PostService.PostCreateAsync(post);
             if(newPost != null)
-                _unitOfWork.Commit();
+                await _unitOfWork.Commit();
            
             var result = _mapper.Map<PostPageResponseDTO>(newPost);
             

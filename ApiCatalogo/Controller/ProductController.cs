@@ -92,7 +92,7 @@ namespace MainBlog.Controller
 
             var product = _mapper.Map<Product>(productDTO);
             var newProduct = await _unitOfWork.ProductRepository.CreateAsync(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
             var newProductDTO = _mapper.Map<ProductDTO>(newProduct);
             return  new CreatedAtRouteResult("ObterProduto", new { id = newProductDTO.ProductId}, newProductDTO);
         }
@@ -107,7 +107,7 @@ namespace MainBlog.Controller
 
             var product = _mapper.Map<Product>(productDTO);        
             var productUpdated = await _unitOfWork.ProductRepository.UpdateAsync(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
 
             var productUpdatedDTO = _mapper.Map<ProductDTO>(productUpdated);
             return Ok(productUpdatedDTO);
@@ -125,7 +125,7 @@ namespace MainBlog.Controller
                 return NotFound();
             
             await _unitOfWork.ProductRepository.DeleteAsync(entity);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
             
             return NoContent();
         }
@@ -145,7 +145,7 @@ namespace MainBlog.Controller
 
             _mapper.Map(entityDTO, entity);
             await _unitOfWork.ProductRepository.UpdateAsync(entity);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
             return Ok(_mapper.Map<ProdutoDTOUpdateResponse>(entity));
         }
     }

@@ -13,5 +13,5 @@ public interface IUnitOfWork
 
     IPostService PostService { get; }
 
-    void Commit();
+    Task Commit();
 }

@@ -11,29 +11,34 @@ namespace MainBlog.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-        public AppDbContext _context;
-        private readonly Lazy<IProductRepository> _productRepository;
-        private readonly Lazy<IProductService> _productService;
-        private readonly Lazy<IBlogService> _blogService;
-        private readonly Lazy<IPostService> _postService;
+        private readonly AppDbContext _context;
+        private readonly IProductRepository _productRepository;
+        private readonly IProductService _productService;
+        private readonly IBlogService _blogService;
+        private readonly IPostService _postService;
 
-        public UnitOfWork(AppDbContext context)
+        public UnitOfWork(
+            AppDbContext context,
+            IProductRepository productRepository,
+            IProductService productService,
+            IBlogService blogService,
+            IPostService postService)
         {
             _context = context;
-            _productRepository = new Lazy<IProductRepository>(() => new ProductRepository(_context));
-            _productService = new Lazy<IProductService>(() => new ProductService(_productRepository.Value));
-            _blogService = new Lazy<IBlogService>(() => new BlogService(new BlogRepository(_context)));
-            _postService = new Lazy<IPostService>(() => new PostService(new PostRepository(_context)));
+            _productRepository = productRepository;
+            _productService = productService;
+            _blogService = blogService;
+            _postService = postService;
         }
 
-        public IProductRepository ProductRepository => _productRepository.Value;
-        public IProductService ProductService => _productService.Value;
-        public IBlogService BlogService => _blogService.Value;
-        public IPostService PostService => _postService.Value;
+        public IProductRepository ProductRepository => _productRepository;
+        public IProductService ProductService => _productService;
+        public IBlogService BlogService => _blogService;
+        public IPostService PostService => _postService;
 
-        public void Commit()
+        public async Task Commit()
         {
-             _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public void RollBack()

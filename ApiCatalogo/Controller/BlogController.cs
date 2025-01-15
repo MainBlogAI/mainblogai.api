@@ -36,10 +36,13 @@ namespace MainBlog.Controller
         public async Task<IActionResult> CreateBlog([FromBody] BlogRequestDTO blogDTO)
         {
             var blog = _mapper.Map<Blog>(blogDTO);
-            var blogResult = _mapper.Map<BlogResponseDTO>(await _unitOfWork.BlogService.PostBlogAsync(blog));
 
-            if(blogResult != null)
-                _unitOfWork.Commit();
+            var blogResult = await _unitOfWork.BlogService.PostBlogAsync(blog);
+
+            if (blogResult != null)
+                await _unitOfWork.Commit();
+
+            var blogResponseDTO = _mapper.Map<BlogResponseDTO>(blogResult);
 
             return Ok(blogResult);
         }

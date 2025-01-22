@@ -32,11 +32,21 @@ namespace MainBlog.Controller
             return Ok(_mapper.Map<List<BlogResponseDTO>>(blogs));
         }
 
+        [HttpGet("getBlogByUserId/{BlogId}")]
+        public async Task<IActionResult> getBlogByUserId(string BlogId)
+        {
+            var blogs = await _unitOfWork.BlogService.GetBlogByUserAsync(BlogId);
+
+            if (blogs == null)
+                return NotFound();
+
+            return Ok(_mapper.Map<List<BlogResponseDTO>>(blogs));
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateBlog([FromBody] BlogRequestDTO blogDTO)
         {
             var blog = _mapper.Map<Blog>(blogDTO);
-
             var blogResult = await _unitOfWork.BlogService.PostBlogAsync(blog);
 
             if (blogResult != null)

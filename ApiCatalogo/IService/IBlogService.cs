@@ -10,5 +10,7 @@ namespace MainBlog.IService
         Task<Blog> PostBlogAsync(Blog blog);
 
         Task<Blog> GetByIdAsync(string id);
+
+        Task<List<Blog>> GetBlogByUserAsync(string UserId);
     }
 }

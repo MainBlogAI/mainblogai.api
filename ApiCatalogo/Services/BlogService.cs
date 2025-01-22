@@ -32,5 +32,10 @@ namespace MainBlog.Services
             }
             return blog;
         }
+
+        public async Task<List<Blog>> GetBlogByUserAsync(string UserId)
+        {
+            return await _blogRepository.GetBlogByUserAsync(UserId);
+        }
     }
 }

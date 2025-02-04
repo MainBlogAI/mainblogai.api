@@ -1,11 +1,7 @@
 ﻿using MainBlog.DTOs.AuthenticationsDTO;
-using MainBlog.Models;
 using MainBlog.Services.AuthenticationsServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MainBlog.IRepository;
-using Microsoft.AspNetCore.Identity.Data;
 using MainBlog.DTOs.Request;
 
 namespace MainBlog.Controller;

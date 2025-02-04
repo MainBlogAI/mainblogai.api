@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using MainBlog.DTOs.Response;
-using MainBlog.IRepository;
+using MainBlog.IService;
 using MainBlog.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MainBlog.Controller
@@ -11,21 +10,21 @@ namespace MainBlog.Controller
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPostService _postService;
         private readonly IMapper _mapper;
 
         public PostController(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IPostService postService)
         {
-            _unitOfWork = unitOfWork;
+            _postService = postService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await _unitOfWork.PostService.GetAllPostsAsync();
+            var posts = await _postService.GetAllPostsAsync();
             var results = _mapper.Map<IList<PostAllResponseDTO>>(posts);
             return Ok(results);
         }
@@ -38,10 +37,7 @@ namespace MainBlog.Controller
                 return BadRequest("O seu post não pode estar vazio");
             }
             var post = _mapper.Map<Posts>(postRequest);
-            var newPost = await _unitOfWork.PostService.PostCreateAsync(post);
-            if(newPost != null)
-                await _unitOfWork.Commit();
-           
+            var newPost = await _postService.PostCreateAsync(post);
             var result = _mapper.Map<PostPageResponseDTO>(newPost);
             
             return Ok(result);
@@ -54,7 +50,7 @@ namespace MainBlog.Controller
             {
                 return BadRequest("O id é invalido");
             }
-            var postById = await _unitOfWork.PostService.GetPostByIdAsync(id);
+            var postById = await _postService.GetPostByIdAsync(id);
             var result = _mapper.Map<PostPageResponseDTO>(postById);
             return Ok(result);
         }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MainBlog.Models
 {
@@ -17,7 +18,9 @@ namespace MainBlog.Models
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public bool IsPublished { get; set; }
         [ForeignKey("Blog")]
+        [JsonIgnore]
         public int BlogId { get; set; }
+        [JsonIgnore]
         public Blog Blog { get; set; }
     }
 }

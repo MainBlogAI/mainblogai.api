@@ -1,17 +1,12 @@
-﻿using MainBlog.IService;
-using MainBlog.Services.AuthenticationsServices;
-
-namespace MainBlog.IRepository;
+﻿namespace MainBlog.IRepository;
 
 public interface IUnitOfWork
 {
     IProductRepository ProductRepository { get; }
 
-    IProductService ProductService { get; }
+    IBlogRepository BlogRepository { get; }
 
-    IBlogService BlogService { get; }
-
-    IPostService PostService { get; }
+    IPostRepository PostRepository { get; }
 
     Task Commit();
 }

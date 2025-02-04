@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MainBlog.DTOs.Request;
-using MainBlog.IRepository;
+using MainBlog.IService;
 using MainBlog.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,21 +10,21 @@ namespace MainBlog.Controller
     [ApiController]
     public class BlogController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBlogService _blogService;
         private readonly IMapper _mapper;
 
         public BlogController(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IBlogService blogService)
         {
-            _unitOfWork = unitOfWork;
+            _blogService = blogService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllBlog()
         {
-            var blogs = await _unitOfWork.BlogService.GetAllBlogAsync();
+            var blogs = await _blogService.GetAllBlogAsync();
 
             if(blogs == null)
                 return NotFound();
@@ -32,10 +32,10 @@ namespace MainBlog.Controller
             return Ok(_mapper.Map<List<BlogResponseDTO>>(blogs));
         }
 
-        [HttpGet("getBlogByUserId/{BlogId}")]
-        public async Task<IActionResult> getBlogByUserId(string BlogId)
+        [HttpGet("getBlogByUserId/{userId}")]
+        public async Task<IActionResult> getBlogByUserId(string userId)
         {
-            var blogs = await _unitOfWork.BlogService.GetBlogByUserAsync(BlogId);
+            var blogs = await _blogService.GetBlogByUserAsync(userId);
 
             if (blogs == null)
                 return NotFound();
@@ -47,20 +47,16 @@ namespace MainBlog.Controller
         public async Task<IActionResult> CreateBlog([FromBody] BlogRequestDTO blogDTO)
         {
             var blog = _mapper.Map<Blog>(blogDTO);
-            var blogResult = await _unitOfWork.BlogService.PostBlogAsync(blog);
-
-            if (blogResult != null)
-                await _unitOfWork.Commit();
-
+            var blogResult = await _blogService.PostBlogAsync(blog);
             var blogResponseDTO = _mapper.Map<BlogResponseDTO>(blogResult);
 
             return Ok(blogResult);
         }
 
-        [HttpGet("getBlogById")]
-        public async Task<IActionResult> GetBlogById([FromQuery]string userId)
+        [HttpGet("getBlogById/{blogId}")]
+        public async Task<IActionResult> GetBlogById(int blogId)
         {
-            var blog = await _unitOfWork.BlogService.GetByIdAsync(userId);
+            var blog = await _blogService.GetByIdAsync(blogId);
             return Ok(_mapper.Map<BlogResponseDTO>(blog));
         }
     }

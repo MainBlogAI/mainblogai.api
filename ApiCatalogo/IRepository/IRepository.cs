@@ -13,6 +13,8 @@ namespace MainBlog.IRepository
         // O tipo de retorno é T?, que significa que o método pode retornar um item do tipo T ou null se não encontrar nenhum item
         Task<T?> GetAsync(Expression<Func<T, bool>> predicate);
 
+        Task<T?> GetIncludesAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
+
         Task<T> CreateAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task<T> DeleteAsync(T entity);

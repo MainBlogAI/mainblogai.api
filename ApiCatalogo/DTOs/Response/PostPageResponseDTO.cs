@@ -9,6 +9,7 @@ namespace MainBlog.DTOs.Response
         public string Content { get; set; }
         public string Author { get; set; }
         public bool IsPublished { get; set; }
+        public DateTime CreatedAt { get; set; }
         public int BlogId { get; set; }
     }
 }

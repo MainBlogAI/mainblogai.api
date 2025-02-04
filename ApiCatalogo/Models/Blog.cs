@@ -21,5 +21,7 @@ namespace MainBlog.Models
 
         [JsonIgnore]
         public ApplicationUser User { get; set; }
+
+        public List<Posts> Posts { get; set; }
     }
 }

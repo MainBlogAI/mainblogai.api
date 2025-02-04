@@ -6,26 +6,38 @@ namespace MainBlog.Services
 {
     public class PostService : IPostService
     {
-        private readonly IPostRepository _postRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PostService(IPostRepository postRepository)
+        public PostService(IUnitOfWork unitOfWork)
         {
-            _postRepository = postRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Posts> PostCreateAsync(Posts posts)
         {
-            return await _postRepository.CreateAsync(posts);
+            try
+            {
+                var newPost = await _unitOfWork.PostRepository.CreateAsync(posts);
+                if (newPost != null)
+                {
+                    await _unitOfWork.Commit();
+                    return newPost;
+                }
+                throw new Exception("Post não foi criado");
+            }
+            catch (Exception ex) {
+                throw new Exception("Post não foi criado",ex);
+            }
         }
 
         public async Task<IEnumerable<Posts>> GetAllPostsAsync()
         {
-            return await _postRepository.GetAllAsync();
+            return await _unitOfWork.PostRepository.GetAllAsync();
         }
 
         public async Task<Posts> GetPostByIdAsync(int id)
         {
-            var post = await _postRepository.GetAsync(p => p.Id == id);
+            var post = await _unitOfWork.PostRepository.GetAsync(p => p.Id == id);
             if (post == null)
                 throw new Exception("O Post não foi encontrado");
             return post;

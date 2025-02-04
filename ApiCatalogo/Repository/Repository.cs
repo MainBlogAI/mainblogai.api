@@ -23,6 +23,18 @@ namespace MainBlog.Repository
             return await _context.Set<T>().Where(predicate).FirstOrDefaultAsync();
         }
 
+        public async Task<T?> GetIncludesAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
         public async Task<T> CreateAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);

@@ -6,26 +6,37 @@ namespace MainBlog.Services
 {
     public class BlogService : IBlogService
     {
-        private readonly IBlogRepository _blogRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public BlogService(IBlogRepository blogRepository)
+        public BlogService(IUnitOfWork unitOfWork)
         {
-            _blogRepository = blogRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Blog> PostBlogAsync(Blog blog)
         {
-           return await _blogRepository.CreateAsync(blog);
+            try
+            {
+                var blogResult = await _unitOfWork.BlogRepository.CreateAsync(blog);
+                if (blogResult != null)
+                    await _unitOfWork.Commit();
+
+                return blogResult;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Falha na criação do post", ex);
+            }
         }
 
         public async Task<IEnumerable<Blog>> GetAllBlogAsync()
         {
-            return await _blogRepository.GetAllAsync();
+            return await _unitOfWork.BlogRepository.GetAllAsync();
         }
 
-        public async Task<Blog> GetByIdAsync(string id)
+        public async Task<Blog> GetByIdAsync(int id)
         {
-            var blog = await _blogRepository.GetAsync(b => b.UserId == id);
+            var blog = await _unitOfWork.BlogRepository.GetIncludesAsync(b => b.Id == id, b => b.Posts);
             if (blog == null)
             {
                 throw new Exception("Blog not found");
@@ -35,7 +46,7 @@ namespace MainBlog.Services
 
         public async Task<List<Blog>> GetBlogByUserAsync(string UserId)
         {
-            return await _blogRepository.GetBlogByUserAsync(UserId);
+            return await _unitOfWork.BlogRepository.GetBlogByUserAsync(UserId);
         }
     }
 }

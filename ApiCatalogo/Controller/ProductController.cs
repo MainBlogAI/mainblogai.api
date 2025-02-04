@@ -1,15 +1,11 @@
-﻿using MainBlog.Context;
-using MainBlog.DTOs;
+﻿using MainBlog.DTOs;
 using MainBlog.Models;
 using MainBlog.Pagination;
 using AutoMapper;
-using Azure;
 using MainBlog.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Configuration;
+using MainBlog.IService;
 
 namespace MainBlog.Controller
 {
@@ -18,12 +14,15 @@ namespace MainBlog.Controller
     public class ProductController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
 
         public ProductController(
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IProductService productService)
         {
+            _productService = productService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }

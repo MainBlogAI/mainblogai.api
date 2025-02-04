@@ -1,6 +1,5 @@
 ﻿using MainBlog.Models;
 using MainBlog.Pagination;
-using MainBlog.Repository;
 using MainBlog.IRepository;
 using MainBlog.IService;
 

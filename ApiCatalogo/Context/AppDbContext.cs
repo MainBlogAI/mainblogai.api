@@ -12,6 +12,9 @@ namespace MainBlog.Context
         public DbSet<Blog>? Blog { get; set; }
 
         public DbSet<Posts>? Posts { get; set; }
+
+        public DbSet<Person> Person { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }

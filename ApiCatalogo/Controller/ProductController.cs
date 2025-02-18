@@ -53,7 +53,7 @@ namespace MainBlog.Controller
         [HttpGet("Pagination")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts ([FromQuery] ProdutosParrameters produtosParameters)
         {
-            var produtos = await _unitOfWork.ProductService.GetPaginatedProductListAsync(produtosParameters);
+            var produtos = await _productService.GetPaginatedProductListAsync(produtosParameters);
             var produtosDTO = _mapper.Map<List<ProductDTO>>(produtos);
             return Ok(produtosDTO);
         }

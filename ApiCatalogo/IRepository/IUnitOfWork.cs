@@ -8,5 +8,8 @@ public interface IUnitOfWork
 
     IPostRepository PostRepository { get; }
 
+    IPersonRepository PersonRepository { get; }
+
     Task Commit();
+    Task RollBack();
 }

@@ -9,31 +9,35 @@ namespace MainBlog.Repository
         private readonly IProductRepository _productRepository;
         private readonly IBlogRepository _blogRepository;
         private readonly IPostRepository _postRepository;
+        private readonly IPersonRepository _personRepository;
 
         public UnitOfWork(
             AppDbContext context,
             IProductRepository productRepository,
             IBlogRepository blogRepository,
-            IPostRepository postRepository)
+            IPostRepository postRepository,
+            IPersonRepository personRepository)
         {
             _context = context;
             _productRepository = productRepository;
             _blogRepository = blogRepository;
             _postRepository = postRepository;
+            _personRepository = personRepository;
         }
 
         public IProductRepository ProductRepository => _productRepository;
         public IBlogRepository BlogRepository => _blogRepository;
         public IPostRepository PostRepository => _postRepository;
+        public IPersonRepository PersonRepository => _personRepository;
 
         public async Task Commit()
         {
             await _context.SaveChangesAsync();
         }
 
-        public void RollBack()
+        public async Task RollBack()
         {
-            _context.Dispose();
+            await _context.DisposeAsync();
         }
     }
 }

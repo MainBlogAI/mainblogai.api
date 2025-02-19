@@ -17,7 +17,7 @@ namespace MainBlog.DTOs.Mappins
             CreateMap<Posts, PostPageResponseDTO>().ReverseMap();
             CreateMap<Posts, PostAllResponseDTO>().ReverseMap();
             CreateMap<Posts, PostCreateRequestDTO>().ReverseMap();
-
+            CreateMap<Person, PersonRequestDTO>().ReverseMap();
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿using MainBlog.DTOs;
+﻿using AutoMapper;
+using MainBlog.DTOs;
+using MainBlog.IRepository;
+using MainBlog.IService;
 using MainBlog.Models;
 using MainBlog.Pagination;
-using AutoMapper;
-using MainBlog.IRepository;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using MainBlog.IService;
 
 namespace MainBlog.Controller
 {

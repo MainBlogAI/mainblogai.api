@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MainBlog.DTOs.AuthenticationsDTO;
 using MainBlog.DTOs.Request;
 using MainBlog.IService;
 using MainBlog.Models;
@@ -28,7 +29,7 @@ namespace MainBlog.Controller
             var person = _mapper.Map<Person>(personDTO);
             var newPerson = await _personService.CreatePersonAsync(person);
             if (newPerson != null)
-                return Ok(newPerson);
+                return Ok(_mapper.Map<PersonCreateResponse>(newPerson));
             return BadRequest();
         }
     }

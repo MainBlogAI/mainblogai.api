@@ -32,7 +32,11 @@ namespace MainBlog.Services
             }
 
             return newPerson;
+        }
 
+        public async Task<Person> GetPersonByUserIdAsync(string userId)
+        {
+            return await _unitOfWork.PersonRepository.GetAsync(x => x.UserId == userId);
         }
     }
 }

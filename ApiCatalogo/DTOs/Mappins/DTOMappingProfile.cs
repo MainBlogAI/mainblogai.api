@@ -2,6 +2,7 @@
 using AutoMapper;
 using MainBlog.DTOs.Request;
 using MainBlog.DTOs.Response;
+using MainBlog.DTOs.AuthenticationsDTO;
 
 namespace MainBlog.DTOs.Mappins
 {
@@ -18,6 +19,7 @@ namespace MainBlog.DTOs.Mappins
             CreateMap<Posts, PostAllResponseDTO>().ReverseMap();
             CreateMap<Posts, PostCreateRequestDTO>().ReverseMap();
             CreateMap<Person, PersonRequestDTO>().ReverseMap();
+            CreateMap<Person, PersonCreateResponse>().ReverseMap();
         }
     }
 }

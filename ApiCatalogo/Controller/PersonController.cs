@@ -32,5 +32,14 @@ namespace MainBlog.Controller
                 return Ok(_mapper.Map<PersonCreateResponse>(newPerson));
             return BadRequest();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPersonByUserIdAsync(string userId)
+        {
+            var newPerson = await _personService.GetPersonByUserIdAsync(userId);
+            if (newPerson != null)
+                return Ok(_mapper.Map<PersonCreateResponse>(newPerson));
+            return NotFound();
+        }
     }
 }
